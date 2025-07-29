@@ -1,0 +1,90 @@
+import React, { useState } from "react";
+
+const words = [
+  {
+    word: "cat",
+    audio: "/audio/cat.mp3",
+    letters: ["c", "a", "t"],
+  },
+  {
+    word: "dog",
+    audio: "/audio/dog.mp3",
+    letters: ["d", "o", "g"],
+  },
+];
+
+const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+
+export default function WordWiggleGame() {
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [userLetters, setUserLetters] = useState([]);
+
+  const currentWord = words[currentWordIndex];
+  const shuffledLetters = shuffle(currentWord.letters);
+
+  const handleDrop = (letter) => {
+    setUserLetters([...userLetters, letter]);
+  };
+
+  const playAudio = () => {
+    const audio = new Audio(currentWord.audio);
+    audio.play();
+  };
+
+  const checkAnswer = () => {
+    return userLetters.join("") === currentWord.word;
+  };
+
+  const nextWord = () => {
+    setUserLetters([]);
+    setCurrentWordIndex((i) => (i + 1) % words.length);
+  };
+
+  return (
+    <div className="p-6 max-w-md mx-auto text-center">
+      <h1 className="text-3xl font-bold mb-4 text-purple-700">WordWiggle!</h1>
+
+      <p className="mb-2 text-lg">Drag the letters to spell the word you hear.</p>
+
+      <button
+        className="mb-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl"
+        onClick={playAudio}
+      >
+        🔊 Play Word
+      </button>
+
+      <div className="flex justify-center space-x-2 mb-4">
+        {shuffledLetters.map((letter, idx) => (
+          <button
+            key={idx}
+            onClick={() => handleDrop(letter)}
+            className="bg-yellow-300 rounded-xl px-4 py-2 text-2xl font-bold shadow-md hover:scale-105 transition"
+          >
+            {letter}
+          </button>
+        ))}
+      </div>
+
+      <div className="border-2 border-dashed h-20 flex items-center justify-center mb-4 text-2xl">
+        {userLetters.join(" ")}
+      </div>
+
+      {userLetters.length === currentWord.letters.length && (
+        <div>
+          {checkAnswer() ? (
+            <div className="text-green-600 font-bold mb-2">🎉 Great job!</div>
+          ) : (
+            <div className="text-red-500 font-bold mb-2">❌ Try again</div>
+          )}
+
+          <button
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl"
+            onClick={nextWord}
+          >
+            Next Word ➡️
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
